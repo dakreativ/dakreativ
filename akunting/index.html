@@ -36,9 +36,9 @@
         .report-row { display: flex; justify-content: space-between; padding: 5px 0; }
         .report-total { display: flex; justify-content: space-between; font-weight: bold; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 5px; color: #0f172a; }
         .profit { color: #16a34a; font-size: 20px; font-weight: bold; background: #dcfce7; padding: 15px; border-radius: 8px; margin-top: 20px;}
+        .loss { color: #dc2626; font-size: 20px; font-weight: bold; background: #fee2e2; padding: 15px; border-radius: 8px; margin-top: 20px;}
         .balance { font-size: 18px; font-weight: bold; background: #e0f2fe; padding: 15px; border-radius: 8px; }
         
-        /* Desain Kotak Pajak */
         .tax-box { background-color: #fffbeb; border-left: 5px solid #f59e0b; padding: 15px; border-radius: 6px; margin-top: 25px; }
         .tax-box h3 { color: #b45309; margin: 0 0 5px 0; font-size: 16px; border: none; }
         .tax-box p { color: #92400e; font-size: 13px; margin: 0 0 10px 0; }
@@ -66,11 +66,11 @@
                     <div class="col"><label>Nominal (Rp)</label><input type="number" id="nominal" class="form-control" placeholder="Cth: 5000000"></div>
                 </div>
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <label>Keterangan</label><input type="text" id="keterangan" class="form-control" placeholder="Contoh: Modal Awal / Pelunasan Web / Bayar Listrik">
+                    <label>Keterangan</label><input type="text" id="keterangan" class="form-control" placeholder="Contoh: Beli Monitor / Bayar Lisensi Web">
                 </div>
                 <div class="row">
                     <div class="col">
-                        <label>Posisi Debit (Uang Masuk ke / Biaya Bertambah)</label>
+                        <label>Posisi Debit (Uang Masuk ke / Biaya & Aset Bertambah)</label>
                         <select id="debit" class="form-control"></select>
                     </div>
                     <div class="col">
@@ -108,7 +108,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                <button onclick="downloadExcel()" class="btn-submit btn-excel">📥 Download Data ke Excel (.csv)</button>
+                <button onclick="downloadExcelBukuBesar()" class="btn-submit btn-excel">📥 Download Riwayat ke Excel (.csv)</button>
             </div>
         </div>
 
@@ -124,10 +124,7 @@
                 <div class="tax-box">
                     <h3>Pajak UMKM PPh Final (0,5%)</h3>
                     <p>Estimasi pajak yang harus disetor bulan ini (0,5% dari Total Pendapatan Kotor)</p>
-                    <div class="tax-amount">
-                        <span>Total Pajak:</span>
-                        <span id="estimasi-pajak">Rp 0</span>
-                    </div>
+                    <div class="tax-amount"><span>Total Pajak:</span><span id="estimasi-pajak">Rp 0</span></div>
                 </div>
 
                 <div class="report-section" style="margin-top: 30px;">
@@ -146,9 +143,11 @@
                     <div class="report-total"><span>Total Biaya Operasional</span><span id="tot-beban">Rp 0</span></div>
                 </div>
 
-                <div class="report-total profit">
-                    <span>Laba Bersih</span><span id="laba-bersih">Rp 0</span>
+                <div id="kotak-laba-bersih" class="report-total profit">
+                    <span id="label-untung-rugi">Laba Bersih (Untung)</span><span id="laba-bersih">Rp 0</span>
                 </div>
+                
+                <button onclick="downloadExcelLabaRugi()" class="btn-submit btn-excel" style="margin-top: 30px;">📊 Download Laba Rugi ke Excel (.csv)</button>
             </div>
         </div>
 
@@ -206,7 +205,7 @@
             '6-2200': { nama: 'Biaya Listrik & Air', normal: 'Debit' },
             '6-2300': { nama: 'Biaya Langganan Software', normal: 'Debit' },
             '6-2400': { nama: 'Biaya Internet & Komunikasi', normal: 'Debit' },
-            '6-2900': { nama: 'Beban Pajak PPh Final 0,5%', normal: 'Debit' } // Akun Baru untuk Pajak
+            '6-2900': { nama: 'Beban Pajak PPh Final 0,5%', normal: 'Debit' }
         };
 
         let optionHtml = '<option value="">-- Pilih Laci Akun --</option>';
@@ -240,19 +239,57 @@
             muatData(); 
         }
 
-        function downloadExcel() {
+        // Fungsi Download Excel BUKU BESAR
+        function downloadExcelBukuBesar() {
             let database = JSON.parse(localStorage.getItem('db_dakreativ')) || [];
-            if(database.length === 0) return alert("Belum ada data untuk didownload!");
+            if(database.length === 0) return alert("Belum ada data!");
             let csvContent = "data:text/csv;charset=utf-8,Tanggal,Keterangan,Akun Debit,Akun Kredit,Nominal (Rp)\n";
             database.forEach(d => {
-                let ketBersih = d.ket.replace(/,/g, " "); 
-                let baris = `${d.tgl},${ketBersih},${coa[d.debit].nama},${coa[d.kredit].nama},${d.nominal}`;
+                let baris = `${d.tgl},${d.ket.replace(/,/g, " ")},${coa[d.debit].nama},${coa[d.kredit].nama},${d.nominal}`;
                 csvContent += baris + "\n";
             });
-            var encodedUri = encodeURI(csvContent);
+            buatLinkDownload(csvContent, "Buku_Besar_Dakreativ.csv");
+        }
+
+        // Fungsi Download Excel LABA RUGI
+        function downloadExcelLabaRugi() {
+            let database = JSON.parse(localStorage.getItem('db_dakreativ')) || [];
+            if(database.length === 0) return alert("Belum ada data!");
+
+            let saldo = {};
+            for(let k in coa) saldo[k] = 0;
+            database.forEach(trx => {
+                if(coa[trx.debit].normal === 'Debit') saldo[trx.debit] += trx.nominal; else saldo[trx.debit] -= trx.nominal;
+                if(coa[trx.kredit].normal === 'Kredit') saldo[trx.kredit] += trx.nominal; else saldo[trx.kredit] -= trx.nominal;
+            });
+
+            let csv = "data:text/csv;charset=utf-8,KATEGORI,AKUN,NOMINAL (Rp)\n";
+            let tPdpt = 0, tHpp = 0, tBeban = 0;
+
+            csv += "PENDAPATAN,,\n";
+            for(let k in saldo) { if(k.startsWith('4') && saldo[k] !== 0) { csv += `,${coa[k].nama},${saldo[k]}\n`; tPdpt += saldo[k]; } }
+            csv += `TOTAL PENDAPATAN,,${tPdpt}\n\n`;
+
+            csv += "HARGA POKOK PENJUALAN (HPP),,\n";
+            for(let k in saldo) { if(k.startsWith('5') && saldo[k] !== 0) { csv += `,${coa[k].nama},${saldo[k]}\n`; tHpp += saldo[k]; } }
+            csv += `TOTAL HPP,,${tHpp}\n`;
+            csv += `LABA KOTOR,,${tPdpt - tHpp}\n\n`;
+
+            csv += "BIAYA OPERASIONAL,,\n";
+            for(let k in saldo) { if(k.startsWith('6') && saldo[k] !== 0) { csv += `,${coa[k].nama},${saldo[k]}\n`; tBeban += saldo[k]; } }
+            csv += `TOTAL OPERASIONAL,,${tBeban}\n\n`;
+            
+            csv += `ESTIMASI PAJAK UMKM 0.5%,,${tPdpt * 0.005}\n\n`;
+            csv += `LABA BERSIH,,${(tPdpt - tHpp) - tBeban}\n`;
+
+            buatLinkDownload(csv, "Laba_Rugi_Dakreativ.csv");
+        }
+
+        function buatLinkDownload(content, filename) {
+            var encodedUri = encodeURI(content);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Laporan_Jurnal_Dakreativ.csv");
+            link.setAttribute("download", filename);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -298,25 +335,33 @@
                 }
             }
 
-            // Hitungan Pajak Otomatis (0.5% dari Total Pendapatan)
-            let pajakUMKM = totPdpt * 0.005;
-
             let labaKotor = totPdpt - totHPP;
             let labaBersih = labaKotor - totBeban;
 
+            // Cetak Laba Rugi
             document.getElementById('lr-pendapatan').innerHTML = htmlPdpt || '<i>Belum ada data</i>';
             document.getElementById('tot-pendapatan').innerText = 'Rp ' + totPdpt.toLocaleString('id-ID');
-            
-            // Render Pajak ke Layar
-            document.getElementById('estimasi-pajak').innerText = 'Rp ' + pajakUMKM.toLocaleString('id-ID');
-
+            document.getElementById('estimasi-pajak').innerText = 'Rp ' + (totPdpt * 0.005).toLocaleString('id-ID');
             document.getElementById('lr-hpp').innerHTML = htmlHPP || '<i>Belum ada data</i>';
             document.getElementById('tot-hpp').innerText = 'Rp ' + totHPP.toLocaleString('id-ID');
             document.getElementById('laba-kotor').innerText = 'Rp ' + labaKotor.toLocaleString('id-ID');
             document.getElementById('lr-beban').innerHTML = htmlBeban || '<i>Belum ada data</i>';
             document.getElementById('tot-beban').innerText = 'Rp ' + totBeban.toLocaleString('id-ID');
+            
+            // Logika Warna Untung / Rugi
+            let kotakLabaBersih = document.getElementById('kotak-laba-bersih');
+            let labelUntungRugi = document.getElementById('label-untung-rugi');
+            
+            if(labaBersih < 0) {
+                kotakLabaBersih.className = "report-total loss";
+                labelUntungRugi.innerText = "Laba Bersih (RUGI)";
+            } else {
+                kotakLabaBersih.className = "report-total profit";
+                labelUntungRugi.innerText = "Laba Bersih (UNTUNG)";
+            }
             document.getElementById('laba-bersih').innerText = 'Rp ' + labaBersih.toLocaleString('id-ID');
 
+            // Cetak Neraca
             let totalPasiva = totKew + totMod + labaBersih;
             document.getElementById('nr-harta').innerHTML = htmlHarta || '<i>Belum ada data</i>';
             document.getElementById('tot-aktiva').innerText = 'Rp ' + totHarta.toLocaleString('id-ID');
@@ -326,14 +371,6 @@
             document.getElementById('nr-laba-berjalan').innerText = 'Rp ' + labaBersih.toLocaleString('id-ID');
             document.getElementById('tot-modal').innerText = 'Rp ' + (totMod + labaBersih).toLocaleString('id-ID');
             document.getElementById('tot-pasiva').innerText = 'Rp ' + totalPasiva.toLocaleString('id-ID');
-        }
-
-        function hapusData() {
-            if(confirm("Yakin mau menghapus semua riwayat transaksi?")) {
-                localStorage.removeItem('db_dakreativ');
-                muatData();
-                alert("Data berhasil dikosongkan!");
-            }
         }
 
         muatData();
