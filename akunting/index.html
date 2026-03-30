@@ -3,46 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Akuntansi PT Dakreativ - Professional Ledger</title>
+    <title>Sistem Akuntansi PT Dakreativ - Pro Version</title>
     <style>
-        :root {
-            --primary: #2d5a61; --secondary: #3b82f6; --bg: #f1f5f9; --text: #1e293b;
-        }
+        :root { --primary: #0f766e; --secondary: #0ea5e9; --bg: #f8fafc; --text: #334155; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; color: var(--text); }
         
         /* SIDEBAR */
-        .sidebar { width: 250px; background: #1e293b; color: white; height: 100vh; position: fixed; padding: 20px 0; }
+        .sidebar { width: 250px; background: #0f172a; color: white; height: 100vh; position: fixed; padding: 20px 0; overflow-y: auto;}
         .sidebar h2 { text-align: center; font-size: 16px; color: #38bdf8; padding: 10px; border-bottom: 1px solid #334155; }
-        .sidebar a { display: block; color: #94a3b8; padding: 12px 25px; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; }
-        .sidebar a:hover, .sidebar a.active { background: #334155; color: white; border-left-color: #38bdf8; }
+        .sidebar a { display: block; color: #94a3b8; padding: 12px 25px; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; font-size: 14px;}
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: white; border-left-color: #38bdf8; }
 
         /* CONTENT */
         .content { margin-left: 250px; padding: 30px; width: 100%; box-sizing: border-box; }
         .page { display: none; }
-        .page.active { display: block; }
+        .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         /* CARD & TABLES */
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 4px solid var(--primary); }
-        h1 { font-size: 20px; margin-bottom: 20px; color: var(--primary); }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 4px solid var(--primary); }
+        h1 { font-size: 22px; margin-bottom: 20px; color: var(--primary); }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-        th { background: #3c8d99; color: white; padding: 10px; text-align: center; border: 1px solid #ddd; text-transform: uppercase; }
+        th { background: #0f766e; color: white; padding: 10px; text-align: center; border: 1px solid #ddd; }
         td { padding: 8px; border: 1px solid #ddd; }
         .row-group { background: #fdfdfd; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
 
         /* FORMS */
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 12px; }
-        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-save { background: #38bdf8; color: white; width: 100%; margin-top: 15px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;}
+        .btn-save { background: #0ea5e9; color: white; width: 100%; margin-top: 15px; }
+        .btn-save:hover { background: #0284c7; }
 
         /* REPORT BOXES */
         .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .tax-box { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 8px; color: #9a3412; margin-bottom: 20px; }
-        .total-line { display: flex; justify-content: space-between; font-weight: bold; padding: 8px 0; border-top: 1px solid #eee; }
+        .tax-box { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px; color: #92400e; margin-bottom: 20px; }
+        .total-line { display: flex; justify-content: space-between; font-weight: bold; padding: 10px 0; border-top: 2px solid #e2e8f0; margin-top: 5px;}
     </style>
 </head>
 <body>
@@ -55,7 +55,7 @@
         <a onclick="nav('neraca')" id="nav-neraca">⚖️ Neraca</a>
         <div style="padding: 20px; margin-top: 30px;">
             <button onclick="downloadCSV()" class="btn" style="background:#10b981; color:white; width:100%; margin-bottom:10px;">📥 Download SPT</button>
-            <button onclick="resetData()" style="background:none; border:none; color:#64748b; font-size:10px; cursor:pointer; width:100%;">⚠️ Hapus Semua Data</button>
+            <button onclick="resetData()" style="background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer; width:100%;">⚠️ Reset Data (Hapus)</button>
         </div>
     </div>
 
@@ -66,47 +66,45 @@
             <div class="card">
                 <div class="form-grid">
                     <div><label>Tanggal</label><input type="date" id="f-tgl" class="form-control"></div>
-                    <div><label>No Bukti (No Nota)</label><input type="text" id="f-bukti" class="form-control" placeholder="Cth: 001/INV/2026"></div>
-                    <div><label>Nama Customer/Vendor (Opsional)</label><input type="text" id="f-entitas" class="form-control" placeholder="Cth: Klien Hotel / Toko Laptop"></div>
+                    <div><label>Nominal (Rp)</label><input type="number" id="f-nom" class="form-control" placeholder="Cth: 5000000"></div>
+                </div>
+                <div class="form-grid">
+                    <div><label>No Bukti / Nota</label><input type="text" id="f-bukti" class="form-control" placeholder="Cth: INV-001"></div>
+                    <div><label>Nama Klien/Vendor</label><input type="text" id="f-entitas" class="form-control" placeholder="Opsional"></div>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label>Keterangan Transaksi</label>
-                    <input type="text" id="f-ket" class="form-control" placeholder="Cth: Pembayaran Project Web Development">
+                    <input type="text" id="f-ket" class="form-control" placeholder="Cth: Bayar Gaji Tim / Pelunasan Web">
                 </div>
+                
+                <hr style="border:0; border-top:1px dashed #ccc; margin: 25px 0;">
+
                 <div class="form-grid">
                     <div>
-                        <label>Akun DEBET (Uang Masuk/Biaya)</label>
+                        <label style="color:#0ea5e9;">Posisi DEBIT (Uang Masuk / Biaya Bertambah)</label>
                         <select id="f-deb-akun" class="form-control"></select>
                     </div>
                     <div>
-                        <label>Akun KREDIT (Uang Keluar/Pendapatan)</label>
+                        <label style="color:#0ea5e9;">Posisi KREDIT (Sumber Uang / Pendapatan)</label>
                         <select id="f-kre-akun" class="form-control"></select>
                     </div>
-                    <div>
-                        <label>Jumlah Nominal (Rp)</label>
-                        <input type="number" id="f-nom" class="form-control" placeholder="0">
-                    </div>
                 </div>
-                <div class="form-grid">
-                    <div><label>Jatuh Tempo (Jika Hutang/Piutang)</label><input type="date" id="f-tempo" class="form-control"></div>
-                </div>
-                <button onclick="saveTrx()" class="btn btn-save">SIMPAN TRANSAKSI KE JURNAL</button>
+                <button onclick="saveTrx()" class="btn btn-save">SIMPAN TRANSAKSI</button>
             </div>
         </div>
 
         <div id="jurnal" class="page">
-            <h1>Jurnal Umum Perusahaan</h1>
-            <div class="card">
+            <h1>Jurnal Umum</h1>
+            <div class="card" style="overflow-x: auto;">
                 <table>
                     <thead>
                         <tr>
                             <th rowspan="2">TANGGAL</th>
                             <th rowspan="2">NO BUKTI</th>
                             <th rowspan="2">KETERANGAN</th>
-                            <th colspan="2">OS AKU</th>
-                            <th rowspan="2">NAMA HUTANG / PIUTANG</th>
-                            <th rowspan="2">JATUH TEMPO</th>
-                            <th colspan="2">JUMLAH</th>
+                            <th colspan="2">AKUN (COA)</th>
+                            <th rowspan="2">KLIEN/VENDOR</th>
+                            <th colspan="2">JUMLAH (Rp)</th>
                         </tr>
                         <tr>
                             <th>KODE</th>
@@ -117,8 +115,8 @@
                     </thead>
                     <tbody id="body-jurnal"></tbody>
                     <tfoot>
-                        <tr style="background:#f1f5f9; font-weight:bold;">
-                            <td colspan="7" class="text-right">TOTAL BALANCE</td>
+                        <tr style="background:#f1f5f9; font-weight:bold; font-size:14px;">
+                            <td colspan="6" class="text-right">TOTAL BALANCE SEIMBANG:</td>
                             <td class="text-right" id="tot-deb">0</td>
                             <td class="text-right" id="tot-kre">0</td>
                         </tr>
@@ -130,41 +128,41 @@
         <div id="laba" class="page">
             <h1>Laporan Laba Rugi</h1>
             <div class="tax-box">
-                <strong>Estimasi Pajak PPh Final 0,5%:</strong>
-                <span id="pajak-val" style="font-size: 20px; margin-left: 10px;">Rp 0</span>
-                <div style="font-size: 11px; margin-top: 5px;">(Dihitung dari seluruh Total Pendapatan Kotor)</div>
+                <strong>Pajak UMKM 0,5% Bulan Ini:</strong>
+                <span id="pajak-val" style="font-size: 24px; margin-left: 10px;">Rp 0</span>
+                <div style="font-size: 12px; margin-top: 5px;">(Pajak dihitung otomatis dari total seluruh uang masuk/pendapatan kotor)</div>
             </div>
             <div class="card">
-                <h3>PENDAPATAN</h3>
+                <h3 style="color:#16a34a;">PENDAPATAN KOTOR (OMZET)</h3>
                 <div id="list-pdpt"></div>
-                <div class="total-line"><span>TOTAL PENDAPATAN</span><span id="sum-pdpt">0</span></div>
+                <div class="total-line"><span>Total Pendapatan</span><span id="sum-pdpt">Rp 0</span></div>
 
-                <h3 style="margin-top:20px;">BIAYA & HPP</h3>
+                <h3 style="margin-top:25px; color:#dc2626;">BIAYA & PENGELUARAN</h3>
                 <div id="list-biaya"></div>
-                <div class="total-line"><span>TOTAL BIAYA</span><span id="sum-biaya">0</span></div>
+                <div class="total-line"><span>Total Biaya</span><span id="sum-biaya">Rp 0</span></div>
 
-                <div class="total-line" id="box-laba" style="margin-top:30px; font-size:18px; padding:15px; border-radius:5px;">
-                    <span id="label-laba">LABA BERSIH</span><span id="val-laba">0</span>
+                <div class="total-line" id="box-laba" style="margin-top:30px; font-size:20px; padding:20px; border-radius:8px;">
+                    <span id="label-laba">LABA BERSIH</span><span id="val-laba">Rp 0</span>
                 </div>
             </div>
         </div>
 
         <div id="neraca" class="page">
-            <h1>Neraca (Balance Sheet)</h1>
+            <h1>Neraca (Posisi Keuangan)</h1>
             <div class="report-grid">
                 <div class="card">
-                    <h3>AKTIVA (HARTA)</h3>
+                    <h3 style="color:#0284c7;">AKTIVA (HARTA KEKAYAAN)</h3>
                     <div id="nr-harta"></div>
-                    <div class="total-line" style="background:#e0f2fe; padding:10px;"><span>TOTAL AKTIVA</span><span id="sum-harta">0</span></div>
+                    <div class="total-line" style="background:#e0f2fe; padding:15px; border-radius:5px;"><span>TOTAL AKTIVA</span><span id="sum-harta">Rp 0</span></div>
                 </div>
                 <div class="card">
-                    <h3>PASIVA (MODAL & HUTANG)</h3>
+                    <h3 style="color:#9333ea;">PASIVA (MODAL & HUTANG)</h3>
                     <div id="nr-kewajiban"></div>
                     <div id="nr-modal"></div>
-                    <div class="report-row" style="display:flex; justify-content:space-between; padding:5px 0; font-weight:bold; color:green;">
-                        <span>Laba Tahun Berjalan</span><span id="nr-laba">0</span>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0; font-weight:bold; color:#16a34a;">
+                        <span>Laba Berjalan (Dari Laba Rugi)</span><span id="nr-laba">Rp 0</span>
                     </div>
-                    <div class="total-line" style="background:#fef2f2; padding:10px;"><span>TOTAL PASIVA</span><span id="sum-pasiva">0</span></div>
+                    <div class="total-line" style="background:#f3e8ff; padding:15px; border-radius:5px;"><span>TOTAL PASIVA</span><span id="sum-pasiva">Rp 0</span></div>
                 </div>
             </div>
         </div>
@@ -172,29 +170,47 @@
     </div>
 
     <script>
-        const COA = {
-            '111': { n: 'Kas Utama (DANA)', cat: 'Harta', norm: 'D' },
-            '112': { n: 'Bank Utama', cat: 'Harta', norm: 'D' },
-            '120': { n: 'Piutang Usaha', cat: 'Harta', norm: 'D' },
-            '175': { n: 'Inventaris Peralatan', cat: 'Harta', norm: 'D' },
-            '211': { n: 'Hutang Usaha', cat: 'Hutang', norm: 'K' },
-            '311': { n: 'Modal Disetor', cat: 'Modal', norm: 'K' },
-            '401': { n: 'Pendapatan Jasa Branding/Desain', cat: 'Pdpt', norm: 'K' },
-            '402': { n: 'Pendapatan Web Development', cat: 'Pdpt', norm: 'K' },
-            '403': { n: 'Pendapatan dainvitation', cat: 'Pdpt', norm: 'K' },
-            '404': { n: 'Pendapatan Produk Digital', cat: 'Pdpt', norm: 'K' },
-            '410': { n: 'Pendapatan Bimbel Pintar Ceria', cat: 'Pdpt', norm: 'K' },
-            '501': { n: 'HPP / Fee Tim Project', cat: 'Biaya', norm: 'D' },
-            '601': { n: 'Biaya Sewa Gedung/Ruko', cat: 'Biaya', norm: 'D' },
-            '610': { n: 'Biaya Internet & Komunikasi', cat: 'Biaya', norm: 'D' },
-            '611': { n: 'Biaya Langganan Software', cat: 'Biaya', norm: 'D' },
-            '612': { n: 'Biaya Listrik & Air', cat: 'Biaya', norm: 'D' },
-            '613': { n: 'Biaya Pemasaran', cat: 'Biaya', norm: 'D' }
+        // MASTER COA 4 DIGIT (Sesuai Permintaan Dadan)
+        const COA_GROUPS = {
+            "HARTA (KODE 1)": {
+                '1-1110': { n: 'Kas Utama (DANA)', cat: 'Harta', norm: 'D' },
+                '1-1200': { n: 'Piutang Usaha (Klien Ngutang)', cat: 'Harta', norm: 'D' },
+                '1-2100': { n: 'Peralatan & Aset (Laptop/Pad/Monitor)', cat: 'Harta', norm: 'D' }
+            },
+            "KEWAJIBAN & MODAL (KODE 2 & 3)": {
+                '2-1100': { n: 'Hutang Usaha (Kita Ngutang)', cat: 'Hutang', norm: 'K' },
+                '3-1100': { n: 'Modal Disetor (Awal PT)', cat: 'Modal', norm: 'K' },
+                '3-1200': { n: 'Prive (Ambil Uang Pribadi)', cat: 'Modal', norm: 'D' }
+            },
+            "PENDAPATAN (KODE 4)": {
+                '4-1100': { n: 'Pendapatan dainvitation', cat: 'Pdpt', norm: 'K' },
+                '4-1200': { n: 'Pendapatan Web Development', cat: 'Pdpt', norm: 'K' },
+                '4-1300': { n: 'Pendapatan Visual Branding', cat: 'Pdpt', norm: 'K' },
+                '4-1400': { n: 'Pendapatan Produk Digital', cat: 'Pdpt', norm: 'K' },
+                '4-2100': { n: 'Pendapatan Bimbel Pintar Ceria', cat: 'Pdpt', norm: 'K' }
+            },
+            "BIAYA & PENGELUARAN (KODE 5 & 6)": {
+                '5-1100': { n: 'Biaya Server & Domain', cat: 'Biaya', norm: 'D' },
+                '5-2100': { n: 'Fee / Gaji Tim Project', cat: 'Biaya', norm: 'D' },
+                '6-2100': { n: 'Biaya Sewa Ruko/Rumah', cat: 'Biaya', norm: 'D' },
+                '6-2200': { n: 'Biaya Listrik, Air & Internet', cat: 'Biaya', norm: 'D' },
+                '6-2300': { n: 'Biaya Lisensi Software', cat: 'Biaya', norm: 'D' }
+            }
         };
 
-        // Populate Dropdowns
-        let optHtml = '<option value="">-- Pilih Akun --</option>';
-        for(let k in COA) optHtml += `<option value="${k}">${k} - ${COA[k].n}</option>`;
+        // Buat gabungan COA untuk mempermudah pemanggilan data
+        let COA = {};
+
+        // Generate Dropdown dengan Kategori yang rapi
+        let optHtml = '<option value="">-- Pilih Akun COA --</option>';
+        for(let group in COA_GROUPS) {
+            optHtml += `<optgroup label="${group}">`;
+            for(let k in COA_GROUPS[group]) {
+                optHtml += `<option value="${k}">${k} - ${COA_GROUPS[group][k].n}</option>`;
+                COA[k] = COA_GROUPS[group][k]; // Gabungkan ke object utama
+            }
+            optHtml += `</optgroup>`;
+        }
         document.getElementById('f-deb-akun').innerHTML = optHtml;
         document.getElementById('f-kre-akun').innerHTML = optHtml;
         document.getElementById('f-tgl').valueAsDate = new Date();
@@ -208,105 +224,121 @@
         }
 
         function saveTrx() {
-            const data = {
-                tgl: document.getElementById('f-tgl').value,
-                bukti: document.getElementById('f-bukti').value || '-',
-                entitas: document.getElementById('f-entitas').value || '-',
-                ket: document.getElementById('f-ket').value,
-                deb: document.getElementById('f-deb-akun').value,
-                kre: document.getElementById('f-kre-akun').value,
-                nom: parseInt(document.getElementById('f-nom').value),
-                tempo: document.getElementById('f-tempo').value || '-'
-            };
+            const tgl = document.getElementById('f-tgl').value;
+            const bukti = document.getElementById('f-bukti').value || '-';
+            const entitas = document.getElementById('f-entitas').value || '-';
+            const ket = document.getElementById('f-ket').value;
+            const deb = document.getElementById('f-deb-akun').value;
+            const kre = document.getElementById('f-kre-akun').value;
+            const nom = parseInt(document.getElementById('f-nom').value);
 
-            if(!data.ket || !data.nom || !data.deb || !data.kre) return alert("Mohon lengkapi Form!");
+            // VALIDASI 1: Cek Kekosongan
+            if(!ket || !nom || !deb || !kre) {
+                return alert("⚠️ Mohon isi Nominal, Keterangan, Akun Debit, dan Akun Kredit!");
+            }
 
-            let db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
+            // VALIDASI 2 (ANTI SALAH): Debit dan Kredit tidak boleh sama!
+            if(deb === kre) {
+                return alert("❌ ERROR: POSISI DEBIT DAN KREDIT TIDAK BOLEH SAMA!\n\nJika kamu bayar Fee Tim, pastikan:\n- Debit: 5-2100 (Fee Tim)\n- Kredit: 1-1110 (Kas DANA PT)\n\nSilakan perbaiki pilihan akunnya.");
+            }
+
+            const data = { tgl, bukti, entitas, ket, deb, kre, nom };
+            let db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
             db.push(data);
-            localStorage.setItem('dakreativ_pro_v3', JSON.stringify(db));
+            localStorage.setItem('dakreativ_final', JSON.stringify(db));
             
-            alert("Berhasil Disimpan!");
+            alert("✅ Transaksi Berhasil Disimpan ke Jurnal!");
             document.getElementById('f-nom').value = "";
             document.getElementById('f-ket').value = "";
             render();
         }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
+            const db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
             let hJurnal = "", s = {}; for(let k in COA) s[k] = 0;
             let tDeb = 0, tKre = 0;
 
             db.forEach(t => {
-                // Baris Debet
+                // Baris Jurnal Double Entry
                 hJurnal += `<tr class="row-group">
                     <td>${t.tgl}</td><td>${t.bukti}</td><td>${t.ket}</td>
                     <td class="text-center">${t.deb}</td><td>${COA[t.deb].n}</td>
-                    <td>${t.entitas}</td><td>${t.tempo}</td>
-                    <td class="text-right">${t.nom.toLocaleString()}</td><td class="text-right">-</td>
-                </tr>`;
-                // Baris Kredit
-                hJurnal += `<tr class="row-group">
+                    <td>${t.entitas}</td>
+                    <td class="text-right">${t.nom.toLocaleString('id-ID')}</td><td class="text-right">-</td>
+                </tr>
+                <tr class="row-group">
                     <td></td><td></td><td></td>
                     <td class="text-center">${t.kre}</td><td>${COA[t.kre].n}</td>
-                    <td></td><td></td>
-                    <td class="text-right">-</td><td class="text-right">${t.nom.toLocaleString()}</td>
+                    <td></td>
+                    <td class="text-right">-</td><td class="text-right">${t.nom.toLocaleString('id-ID')}</td>
                 </tr>`;
                 
                 tDeb += t.nom; tKre += t.nom;
-                // Hitung Saldo Akun
+                
+                // Hitung Saldo
                 if(COA[t.deb].norm === 'D') s[t.deb] += t.nom; else s[t.deb] -= t.nom;
                 if(COA[t.kre].norm === 'K') s[t.kre] += t.nom; else s[t.kre] -= t.nom;
             });
 
             document.getElementById('body-jurnal').innerHTML = hJurnal;
-            document.getElementById('tot-deb').innerText = tDeb.toLocaleString();
-            document.getElementById('tot-kre').innerText = tKre.toLocaleString();
+            document.getElementById('tot-deb').innerText = "Rp " + tDeb.toLocaleString('id-ID');
+            document.getElementById('tot-kre').innerText = "Rp " + tKre.toLocaleString('id-ID');
 
-            // Laba Rugi & Neraca Logic
+            // Kalkulasi Laporan
             let lPdpt = "", lBiaya = "", lHarta = "", lKew = "", lMod = "";
             let sPdpt = 0, sBiaya = 0, sHarta = 0, sKew = 0, sMod = 0;
 
             for(let k in s) {
                 if(s[k] === 0) continue;
-                let row = `<div style="display:flex; justify-content:space-between; padding:5px 0;"><span>${COA[k].n}</span><span>${s[k].toLocaleString()}</span></div>`;
+                let row = `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:13px;"><span>${COA[k].n}</span><span>Rp ${s[k].toLocaleString('id-ID')}</span></div>`;
                 const c = COA[k].cat;
+                
                 if(c === 'Pdpt') { lPdpt += row; sPdpt += s[k]; }
                 else if(c === 'Biaya') { lBiaya += row; sBiaya += s[k]; }
                 else if(c === 'Harta') { lHarta += row; sHarta += s[k]; }
                 else if(c === 'Hutang') { lKew += row; sKew += s[k]; }
                 else if(c === 'Modal') { 
-                    if(COA[k].norm === 'D') sMod -= s[k]; else sMod += s[k];
+                    if(COA[k].norm === 'D') { sMod -= s[k]; row = `<div style="display:flex; justify-content:space-between; padding:8px 0; color:red; font-size:13px;"><span>${COA[k].n}</span><span>- Rp ${s[k].toLocaleString('id-ID')}</span></div>`; } 
+                    else { sMod += s[k]; }
                     lMod += row; 
                 }
             }
 
             let netLaba = sPdpt - sBiaya;
-            document.getElementById('list-pdpt').innerHTML = lPdpt;
-            document.getElementById('sum-pdpt').innerText = sPdpt.toLocaleString();
-            document.getElementById('pajak-val').innerText = "Rp " + (sPdpt * 0.005).toLocaleString();
-            document.getElementById('list-biaya').innerHTML = lBiaya;
-            document.getElementById('sum-biaya').innerText = sBiaya.toLocaleString();
-            document.getElementById('val-laba').innerText = netLaba.toLocaleString();
-            document.getElementById('box-laba').style.background = netLaba >= 0 ? "#dcfce7" : "#fee2e2";
 
-            document.getElementById('nr-harta').innerHTML = lHarta;
-            document.getElementById('sum-harta').innerText = sHarta.toLocaleString();
+            // Cetak Laba Rugi
+            document.getElementById('list-pdpt').innerHTML = lPdpt || '<i>Belum ada pendapatan</i>';
+            document.getElementById('sum-pdpt').innerText = "Rp " + sPdpt.toLocaleString('id-ID');
+            document.getElementById('pajak-val').innerText = "Rp " + (sPdpt * 0.005).toLocaleString('id-ID');
+            document.getElementById('list-biaya').innerHTML = lBiaya || '<i>Belum ada biaya</i>';
+            document.getElementById('sum-biaya').innerText = "Rp " + sBiaya.toLocaleString('id-ID');
+            
+            document.getElementById('val-laba').innerText = "Rp " + netLaba.toLocaleString('id-ID');
+            let boxLaba = document.getElementById('box-laba');
+            if(netLaba < 0) { boxLaba.style.background = "#fee2e2"; boxLaba.style.color = "#991b1b"; document.getElementById('label-laba').innerText = "RUGI BERSIH"; } 
+            else { boxLaba.style.background = "#dcfce7"; boxLaba.style.color = "#166534"; document.getElementById('label-laba').innerText = "LABA BERSIH (UNTUNG)"; }
+
+            // Cetak Neraca
+            document.getElementById('nr-harta').innerHTML = lHarta || '<i>Kosong</i>';
+            document.getElementById('sum-harta').innerText = "Rp " + sHarta.toLocaleString('id-ID');
             document.getElementById('nr-kewajiban').innerHTML = lKew;
             document.getElementById('nr-modal').innerHTML = lMod;
-            document.getElementById('nr-laba').innerText = netLaba.toLocaleString();
-            document.getElementById('sum-pasiva').innerText = (sKew + sMod + netLaba).toLocaleString();
+            document.getElementById('nr-laba').innerText = "Rp " + netLaba.toLocaleString('id-ID');
+            document.getElementById('sum-pasiva').innerText = "Rp " + (sKew + sMod + netLaba).toLocaleString('id-ID');
         }
 
         function downloadCSV() {
-            const db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
-            let csv = "Tanggal,No Bukti,Keterangan,Akun Debet,Akun Kredit,Nominal,Entitas,Jatuh Tempo\n";
-            db.forEach(t => csv += `${t.tgl},${t.bukti},${t.ket.replace(/,/g,' ')},${COA[t.deb].n},${COA[t.kre].n},${t.nom},${t.entitas},${t.tempo}\n`);
+            const db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
+            if(db.length === 0) return alert("Belum ada data!");
+            let csv = "Tanggal,No Bukti,Keterangan,Akun Debet,Akun Kredit,Nominal (Rp),Klien/Vendor\n";
+            db.forEach(t => csv += `${t.tgl},${t.bukti},${t.ket.replace(/,/g,' ')},${COA[t.deb].n},${COA[t.kre].n},${t.nom},${t.entitas}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'Audit_Jurnal_Dakreativ_2026.csv'; a.click();
+            const a = document.createElement('a'); a.href = url; a.download = 'Laporan_Jurnal_Dakreativ.csv'; a.click();
         }
 
-        function resetData() { if(confirm("Hapus permanen semua data?")) { localStorage.clear(); location.reload(); } }
+        function resetData() { if(confirm("YAKIN MAU HAPUS SEMUA DATA? INI TIDAK BISA DIKEMBALIKAN!")) { localStorage.clear(); location.reload(); } }
+        
         render();
     </script>
 </body>
