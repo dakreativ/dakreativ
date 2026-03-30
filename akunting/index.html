@@ -3,165 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accounting PT Dakreativ - Anti Pusing Edition</title>
+    <title>Sistem Akuntansi PT Dakreativ - Professional Ledger</title>
     <style>
         :root {
-            --primary: #0f172a; --accent: #38bdf8; --success: #10b981; 
-            --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc;
+            --primary: #2d5a61; --secondary: #3b82f6; --bg: #f1f5f9; --text: #1e293b;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; display: flex; color: #334155; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; color: var(--text); }
         
         /* SIDEBAR */
-        .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 20px 0; }
-        .sidebar h2 { text-align: center; font-size: 18px; color: var(--accent); margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
-        .sidebar a { display: block; color: #94a3b8; padding: 12px 25px; text-decoration: none; font-size: 14px; transition: 0.3s; border-left: 4px solid transparent; cursor: pointer; }
-        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: white; border-left-color: var(--accent); }
+        .sidebar { width: 250px; background: #1e293b; color: white; height: 100vh; position: fixed; padding: 20px 0; }
+        .sidebar h2 { text-align: center; font-size: 16px; color: #38bdf8; padding: 10px; border-bottom: 1px solid #334155; }
+        .sidebar a { display: block; color: #94a3b8; padding: 12px 25px; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #334155; color: white; border-left-color: #38bdf8; }
 
-        /* MAIN CONTENT */
-        .content { margin-left: 260px; padding: 40px; width: 100%; box-sizing: border-box; }
-        .page { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s; }
+        /* CONTENT */
+        .content { margin-left: 250px; padding: 30px; width: 100%; box-sizing: border-box; }
+        .page { display: none; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* CARD & TABLES */
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 4px solid var(--primary); }
+        h1 { font-size: 20px; margin-bottom: 20px; color: var(--primary); }
 
-        /* CARDS */
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        h1 { font-size: 24px; margin-bottom: 10px; color: var(--primary); }
-        .desc { color: #64748b; font-size: 14px; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        th { background: #3c8d99; color: white; padding: 10px; text-align: center; border: 1px solid #ddd; text-transform: uppercase; }
+        td { padding: 8px; border: 1px solid #ddd; }
+        .row-group { background: #fdfdfd; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
 
         /* FORMS */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px; }
-        .btn-primary { background: #0284c7; color: white; width: 100%; }
-        .btn-success { background: var(--success); color: white; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 12px; }
+        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #38bdf8; color: white; width: 100%; margin-top: 15px; }
 
-        /* TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-        th { background: #f8fafc; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .text-right { text-align: right; }
-
-        /* REPORT STYLES */
-        .report-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; }
-        .total-box { background: #f1f5f9; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; margin-top: 10px; }
-        .tax-card { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        .profit { background: #dcfce7; color: #166534; }
-        .loss { background: #fee2e2; color: #991b1b; }
+        /* REPORT BOXES */
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .tax-box { background: #fff7ed; border: 1px solid #ffedd5; padding: 15px; border-radius: 8px; color: #9a3412; margin-bottom: 20px; }
+        .total-line { display: flex; justify-content: space-between; font-weight: bold; padding: 8px 0; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>PT DAKREATIV</h2>
-        <a onclick="nav('input')" id="nav-input" class="active">📝 Catat Transaksi</a>
-        <a onclick="nav('jurnal')">📖 Riwayat Jurnal</a>
-        <a onclick="nav('hutang')">🤝 Hutang & Piutang</a>
-        <a onclick="nav('laba')">📊 Laba Rugi & Pajak</a>
-        <a onclick="nav('neraca')">⚖️ Neraca Aset</a>
-        <div style="padding: 20px; position: absolute; bottom: 0; width: 100%; box-sizing: border-box;">
-            <button onclick="exportCSV()" class="btn btn-success" style="width: 100%; margin-bottom: 10px;">💾 Download SPT</button>
-            <button onclick="resetData()" style="background:none; border:none; color:#64748b; font-size:11px; cursor:pointer;">⚠️ Reset Data</button>
+        <h2>PT DAKREATIV DIGITAL</h2>
+        <a onclick="nav('input')" id="nav-input" class="active">🆕 Input Transaksi</a>
+        <a onclick="nav('jurnal')" id="nav-jurnal">📓 Jurnal Umum</a>
+        <a onclick="nav('laba')" id="nav-laba">📊 Laba Rugi & Pajak</a>
+        <a onclick="nav('neraca')" id="nav-neraca">⚖️ Neraca</a>
+        <div style="padding: 20px; margin-top: 30px;">
+            <button onclick="downloadCSV()" class="btn" style="background:#10b981; color:white; width:100%; margin-bottom:10px;">📥 Download SPT</button>
+            <button onclick="resetData()" style="background:none; border:none; color:#64748b; font-size:10px; cursor:pointer; width:100%;">⚠️ Hapus Semua Data</button>
         </div>
     </div>
 
     <div class="content">
         
         <div id="input" class="page active">
-            <h1>Catat Transaksi</h1>
-            <p class="desc">Gunakan mode ini agar tidak pusing Debit/Kredit.</p>
+            <h1>Input Transaksi Baru</h1>
             <div class="card">
-                <div class="grid">
-                    <div><label>Tanggal</label><input type="date" id="tgl" class="form-control"></div>
-                    <div><label>Nominal (Rp)</label><input type="number" id="nom" class="form-control" placeholder="0"></div>
+                <div class="form-grid">
+                    <div><label>Tanggal</label><input type="date" id="f-tgl" class="form-control"></div>
+                    <div><label>No Bukti (No Nota)</label><input type="text" id="f-bukti" class="form-control" placeholder="Cth: 001/INV/2026"></div>
+                    <div><label>Nama Customer/Vendor (Opsional)</label><input type="text" id="f-entitas" class="form-control" placeholder="Cth: Klien Hotel / Toko Laptop"></div>
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label>Keterangan</label>
-                    <input type="text" id="ket" class="form-control" placeholder="Cth: Pelunasan Undangan Web atau Beli Monitor">
+                <div style="margin-bottom: 15px;">
+                    <label>Keterangan Transaksi</label>
+                    <input type="text" id="f-ket" class="form-control" placeholder="Cth: Pembayaran Project Web Development">
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label>Jenis Transaksi</label>
-                    <select id="tipe" class="form-control" onchange="updateOptions()">
-                        <option value="masuk">Uang Masuk (Pendapatan)</option>
-                        <option value="keluar">Uang Keluar (Biaya/Gaji)</option>
-                        <option value="aset">Beli Aset (Laptop/Alat Kerja)</option>
-                        <option value="modal">Setor Modal Awal (Aset/Uang)</option>
-                        <option value="piutang">Klien Berhutang (Tagihan Keluar)</option>
-                    </select>
-                </div>
-                <div id="pilihan-akun">
+                <div class="form-grid">
+                    <div>
+                        <label>Akun DEBET (Uang Masuk/Biaya)</label>
+                        <select id="f-deb-akun" class="form-control"></select>
                     </div>
-                <button onclick="simpanTrx()" class="btn btn-primary" style="margin-top: 20px;">Simpan Transaksi</button>
+                    <div>
+                        <label>Akun KREDIT (Uang Keluar/Pendapatan)</label>
+                        <select id="f-kre-akun" class="form-control"></select>
+                    </div>
+                    <div>
+                        <label>Jumlah Nominal (Rp)</label>
+                        <input type="number" id="f-nom" class="form-control" placeholder="0">
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div><label>Jatuh Tempo (Jika Hutang/Piutang)</label><input type="date" id="f-tempo" class="form-control"></div>
+                </div>
+                <button onclick="saveTrx()" class="btn btn-save">SIMPAN TRANSAKSI KE JURNAL</button>
             </div>
         </div>
 
         <div id="jurnal" class="page">
-            <h1>Riwayat Jurnal</h1>
+            <h1>Jurnal Umum Perusahaan</h1>
             <div class="card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Keterangan</th>
-                            <th>Debit</th>
-                            <th>Kredit</th>
-                            <th class="text-right">Nominal</th>
+                            <th rowspan="2">TANGGAL</th>
+                            <th rowspan="2">NO BUKTI</th>
+                            <th rowspan="2">KETERANGAN</th>
+                            <th colspan="2">OS AKU</th>
+                            <th rowspan="2">NAMA HUTANG / PIUTANG</th>
+                            <th rowspan="2">JATUH TEMPO</th>
+                            <th colspan="2">JUMLAH</th>
+                        </tr>
+                        <tr>
+                            <th>KODE</th>
+                            <th>NAMA AKUN</th>
+                            <th>DEBET</th>
+                            <th>KREDIT</th>
                         </tr>
                     </thead>
                     <tbody id="body-jurnal"></tbody>
+                    <tfoot>
+                        <tr style="background:#f1f5f9; font-weight:bold;">
+                            <td colspan="7" class="text-right">TOTAL BALANCE</td>
+                            <td class="text-right" id="tot-deb">0</td>
+                            <td class="text-right" id="tot-kre">0</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
 
         <div id="laba" class="page">
-            <h1>Laba Rugi & Pajak</h1>
-            <div class="tax-card">
-                <div style="font-size: 14px;">Estimasi Pajak PPh Final 0,5% Bulan Ini:</div>
-                <div id="pajak-final" style="font-size: 28px; font-weight: bold; margin-top: 5px;">Rp 0</div>
-                <div style="font-size: 11px; margin-top: 5px;">*Dihitung 0,5% dari total seluruh pendapatan kotor.</div>
+            <h1>Laporan Laba Rugi</h1>
+            <div class="tax-box">
+                <strong>Estimasi Pajak PPh Final 0,5%:</strong>
+                <span id="pajak-val" style="font-size: 20px; margin-left: 10px;">Rp 0</span>
+                <div style="font-size: 11px; margin-top: 5px;">(Dihitung dari seluruh Total Pendapatan Kotor)</div>
             </div>
             <div class="card">
-                <h3>Pendapatan</h3>
-                <div id="list-pendapatan"></div>
-                <div class="total-box"><span>Total Pendapatan (Omzet)</span><span id="tot-pdpt">Rp 0</span></div>
-                
-                <h3 style="margin-top: 30px;">Biaya & Pengeluaran</h3>
-                <div id="list-biaya"></div>
-                <div class="total-box"><span>Total Pengeluaran</span><span id="tot-biaya">Rp 0</span></div>
+                <h3>PENDAPATAN</h3>
+                <div id="list-pdpt"></div>
+                <div class="total-line"><span>TOTAL PENDAPATAN</span><span id="sum-pdpt">0</span></div>
 
-                <div id="box-laba" class="total-box" style="margin-top: 40px; font-size: 22px;">
-                    <span id="label-laba">LABA BERSIH</span><span id="val-laba">Rp 0</span>
+                <h3 style="margin-top:20px;">BIAYA & HPP</h3>
+                <div id="list-biaya"></div>
+                <div class="total-line"><span>TOTAL BIAYA</span><span id="sum-biaya">0</span></div>
+
+                <div class="total-line" id="box-laba" style="margin-top:30px; font-size:18px; padding:15px; border-radius:5px;">
+                    <span id="label-laba">LABA BERSIH</span><span id="val-laba">0</span>
                 </div>
             </div>
         </div>
 
         <div id="neraca" class="page">
-            <h1>Neraca (Posisi Kekayaan)</h1>
-            <div class="grid">
+            <h1>Neraca (Balance Sheet)</h1>
+            <div class="report-grid">
                 <div class="card">
-                    <h3>AKTIVA (Harta)</h3>
-                    <div id="list-harta"></div>
-                    <div class="total-box" style="background:#e0f2fe;"><span>Total Aktiva</span><span id="tot-harta">Rp 0</span></div>
+                    <h3>AKTIVA (HARTA)</h3>
+                    <div id="nr-harta"></div>
+                    <div class="total-line" style="background:#e0f2fe; padding:10px;"><span>TOTAL AKTIVA</span><span id="sum-harta">0</span></div>
                 </div>
                 <div class="card">
-                    <h3>PASIVA (Modal & Hutang)</h3>
-                    <div id="list-pasiva"></div>
-                    <div class="report-row" style="color:var(--success); font-weight:bold;"><span>Laba Berjalan</span><span id="laba-berjalan">Rp 0</span></div>
-                    <div class="total-box" style="background:#fef2f2;"><span>Total Pasiva</span><span id="tot-pasiva">Rp 0</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="hutang" class="page">
-            <h1>Daftar Hutang & Piutang</h1>
-            <div class="grid">
-                <div class="card">
-                    <h3 style="color:var(--success)">Piutang (Klien Belum Bayar)</h3>
-                    <div id="val-piutang" style="font-size: 24px; font-weight: bold;">Rp 0</div>
-                </div>
-                <div class="card">
-                    <h3 style="color:var(--danger)">Hutang (Tagihan Kita)</h3>
-                    <div id="val-hutang" style="font-size: 24px; font-weight: bold;">Rp 0</div>
+                    <h3>PASIVA (MODAL & HUTANG)</h3>
+                    <div id="nr-kewajiban"></div>
+                    <div id="nr-modal"></div>
+                    <div class="report-row" style="display:flex; justify-content:space-between; padding:5px 0; font-weight:bold; color:green;">
+                        <span>Laba Tahun Berjalan</span><span id="nr-laba">0</span>
+                    </div>
+                    <div class="total-line" style="background:#fef2f2; padding:10px;"><span>TOTAL PASIVA</span><span id="sum-pasiva">0</span></div>
                 </div>
             </div>
         </div>
@@ -170,159 +173,140 @@
 
     <script>
         const COA = {
-            '1-1110': 'Kas DANA PT',
-            '1-1200': 'Piutang Usaha',
-            '1-2100': 'Peralatan (Laptop/Monitor)',
-            '2-1100': 'Hutang Usaha',
-            '3-1100': 'Modal Disetor',
-            '4-1100': 'Jasa dainvitation',
-            '4-1200': 'Jasa Web Development',
-            '4-1400': 'Produk Digital',
-            '4-2100': 'Bimbel Pintar Ceria',
-            '5-1100': 'Biaya Server/Domain',
-            '5-2100': 'Fee Tim Project',
-            '6-2100': 'Sewa & Listrik',
-            '6-2300': 'Lisensi Software'
+            '111': { n: 'Kas Utama (DANA)', cat: 'Harta', norm: 'D' },
+            '112': { n: 'Bank Utama', cat: 'Harta', norm: 'D' },
+            '120': { n: 'Piutang Usaha', cat: 'Harta', norm: 'D' },
+            '175': { n: 'Inventaris Peralatan', cat: 'Harta', norm: 'D' },
+            '211': { n: 'Hutang Usaha', cat: 'Hutang', norm: 'K' },
+            '311': { n: 'Modal Disetor', cat: 'Modal', norm: 'K' },
+            '401': { n: 'Pendapatan Jasa Branding/Desain', cat: 'Pdpt', norm: 'K' },
+            '402': { n: 'Pendapatan Web Development', cat: 'Pdpt', norm: 'K' },
+            '403': { n: 'Pendapatan dainvitation', cat: 'Pdpt', norm: 'K' },
+            '404': { n: 'Pendapatan Produk Digital', cat: 'Pdpt', norm: 'K' },
+            '410': { n: 'Pendapatan Bimbel Pintar Ceria', cat: 'Pdpt', norm: 'K' },
+            '501': { n: 'HPP / Fee Tim Project', cat: 'Biaya', norm: 'D' },
+            '601': { n: 'Biaya Sewa Gedung/Ruko', cat: 'Biaya', norm: 'D' },
+            '610': { n: 'Biaya Internet & Komunikasi', cat: 'Biaya', norm: 'D' },
+            '611': { n: 'Biaya Langganan Software', cat: 'Biaya', norm: 'D' },
+            '612': { n: 'Biaya Listrik & Air', cat: 'Biaya', norm: 'D' },
+            '613': { n: 'Biaya Pemasaran', cat: 'Biaya', norm: 'D' }
         };
 
-        function updateOptions() {
-            const tipe = document.getElementById('tipe').value;
-            let html = '';
-            if(tipe === 'masuk') {
-                html = `<label>Diterima Dari Jasa Apa?</label>
-                        <select id="akun_kredit" class="form-control">
-                            <option value="4-1100">dainvitation</option>
-                            <option value="4-1200">Web Development</option>
-                            <option value="4-1400">Produk Digital</option>
-                            <option value="4-2100">Bimbel Pintar Ceria</option>
-                        </select>
-                        <input type="hidden" id="akun_debit" value="1-1110">`;
-            } else if(tipe === 'keluar') {
-                html = `<label>Dipakai Untuk Biaya Apa?</label>
-                        <select id="akun_debit" class="form-control">
-                            <option value="5-2100">Fee Tim Project</option>
-                            <option value="6-2100">Sewa & Listrik</option>
-                            <option value="6-2300">Lisensi Software</option>
-                            <option value="5-1100">Server & Domain</option>
-                        </select>
-                        <input type="hidden" id="akun_kredit" value="1-1110">`;
-            } else if(tipe === 'aset') {
-                html = `<label>Beli Aset Apa?</label>
-                        <select id="akun_debit" class="form-control"><option value="1-2100">Peralatan (Laptop/Monitor/Pad)</option></select>
-                        <label style="margin-top:10px">Bayar Pakai Apa?</label>
-                        <select id="akun_kredit" class="form-control"><option value="1-1110">Kas DANA PT</option></select>`;
-            } else if(tipe === 'modal') {
-                html = `<label>Modal Berupa Apa?</label>
-                        <select id="akun_debit" class="form-control">
-                            <option value="1-1110">Uang Tunai (DANA)</option>
-                            <option value="1-2100">Barang (Laptop/HP/Monitor)</option>
-                        </select>
-                        <input type="hidden" id="akun_kredit" value="3-1100">`;
-            } else if(tipe === 'piutang') {
-                html = `<label>Jasa Yang Belum Dibayar Klien?</label>
-                        <select id="akun_kredit" class="form-control">
-                            <option value="4-1200">Web Development</option>
-                            <option value="4-1100">dainvitation</option>
-                        </select>
-                        <input type="hidden" id="akun_debit" value="1-1200">`;
-            }
-            document.getElementById('pilihan-akun').innerHTML = html;
-        }
+        // Populate Dropdowns
+        let optHtml = '<option value="">-- Pilih Akun --</option>';
+        for(let k in COA) optHtml += `<option value="${k}">${k} - ${COA[k].n}</option>`;
+        document.getElementById('f-deb-akun').innerHTML = optHtml;
+        document.getElementById('f-kre-akun').innerHTML = optHtml;
+        document.getElementById('f-tgl').valueAsDate = new Date();
 
         function nav(p) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             document.getElementById(p).classList.add('active');
-            document.getElementById('nav-'+p)?.classList.add('active');
+            document.getElementById('nav-'+p).classList.add('active');
             render();
         }
 
-        function simpanTrx() {
-            const trx = {
-                tgl: document.getElementById('tgl').value,
-                nom: parseInt(document.getElementById('nom').value),
-                ket: document.getElementById('ket').value,
-                deb: document.getElementById('akun_debit').value,
-                kre: document.getElementById('akun_kredit').value
+        function saveTrx() {
+            const data = {
+                tgl: document.getElementById('f-tgl').value,
+                bukti: document.getElementById('f-bukti').value || '-',
+                entitas: document.getElementById('f-entitas').value || '-',
+                ket: document.getElementById('f-ket').value,
+                deb: document.getElementById('f-deb-akun').value,
+                kre: document.getElementById('f-kre-akun').value,
+                nom: parseInt(document.getElementById('f-nom').value),
+                tempo: document.getElementById('f-tempo').value || '-'
             };
-            if(!trx.nom || !trx.ket) return alert("Isi nominal dan keterangan!");
-            let db = JSON.parse(localStorage.getItem('dakreativ_v2')) || [];
-            db.push(trx);
-            localStorage.setItem('dakreativ_v2', JSON.stringify(db));
-            alert("Tersimpan!");
-            document.getElementById('nom').value = "";
-            document.getElementById('ket').value = "";
+
+            if(!data.ket || !data.nom || !data.deb || !data.kre) return alert("Mohon lengkapi Form!");
+
+            let db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
+            db.push(data);
+            localStorage.setItem('dakreativ_pro_v3', JSON.stringify(db));
+            
+            alert("Berhasil Disimpan!");
+            document.getElementById('f-nom').value = "";
+            document.getElementById('f-ket').value = "";
             render();
         }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('dakreativ_v2')) || [];
+            const db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
             let hJurnal = "", s = {}; for(let k in COA) s[k] = 0;
-            let tPdpt = 0, tBiaya = 0, tHarta = 0, tModal = 0, tHutang = 0;
+            let tDeb = 0, tKre = 0;
 
             db.forEach(t => {
-                hJurnal += `<tr><td>${t.tgl}</td><td>${t.ket}</td><td>${COA[t.deb]}</td><td>${COA[t.kre]}</td><td class="text-right">Rp ${t.nom.toLocaleString()}</td></tr>`;
-                // Hitung Saldo
-                if(['1','5','6'].includes(t.deb[0]) || t.deb === '3-1200') s[t.deb] += t.nom; else s[t.deb] -= t.nom;
-                if(['2','3','4'].includes(t.kre[0]) && t.kre !== '3-1200') s[t.kre] += t.nom; else s[t.kre] -= t.nom;
+                // Baris Debet
+                hJurnal += `<tr class="row-group">
+                    <td>${t.tgl}</td><td>${t.bukti}</td><td>${t.ket}</td>
+                    <td class="text-center">${t.deb}</td><td>${COA[t.deb].n}</td>
+                    <td>${t.entitas}</td><td>${t.tempo}</td>
+                    <td class="text-right">${t.nom.toLocaleString()}</td><td class="text-right">-</td>
+                </tr>`;
+                // Baris Kredit
+                hJurnal += `<tr class="row-group">
+                    <td></td><td></td><td></td>
+                    <td class="text-center">${t.kre}</td><td>${COA[t.kre].n}</td>
+                    <td></td><td></td>
+                    <td class="text-right">-</td><td class="text-right">${t.nom.toLocaleString()}</td>
+                </tr>`;
+                
+                tDeb += t.nom; tKre += t.nom;
+                // Hitung Saldo Akun
+                if(COA[t.deb].norm === 'D') s[t.deb] += t.nom; else s[t.deb] -= t.nom;
+                if(COA[t.kre].norm === 'K') s[t.kre] += t.nom; else s[t.kre] -= t.nom;
             });
 
             document.getElementById('body-jurnal').innerHTML = hJurnal;
+            document.getElementById('tot-deb').innerText = tDeb.toLocaleString();
+            document.getElementById('tot-kre').innerText = tKre.toLocaleString();
 
-            // Render Laba Rugi
-            let listPdpt = "", listBiaya = "";
+            // Laba Rugi & Neraca Logic
+            let lPdpt = "", lBiaya = "", lHarta = "", lKew = "", lMod = "";
+            let sPdpt = 0, sBiaya = 0, sHarta = 0, sKew = 0, sMod = 0;
+
             for(let k in s) {
                 if(s[k] === 0) continue;
-                let row = `<div class="report-row"><span>${COA[k]}</span><span>Rp ${s[k].toLocaleString()}</span></div>`;
-                if(k[0] === '4') { listPdpt += row; tPdpt += s[k]; }
-                if(k[0] === '5' || k[0] === '6') { listBiaya += row; tBiaya += s[k]; }
+                let row = `<div style="display:flex; justify-content:space-between; padding:5px 0;"><span>${COA[k].n}</span><span>${s[k].toLocaleString()}</span></div>`;
+                const c = COA[k].cat;
+                if(c === 'Pdpt') { lPdpt += row; sPdpt += s[k]; }
+                else if(c === 'Biaya') { lBiaya += row; sBiaya += s[k]; }
+                else if(c === 'Harta') { lHarta += row; sHarta += s[k]; }
+                else if(c === 'Hutang') { lKew += row; sKew += s[k]; }
+                else if(c === 'Modal') { 
+                    if(COA[k].norm === 'D') sMod -= s[k]; else sMod += s[k];
+                    lMod += row; 
+                }
             }
-            document.getElementById('list-pendapatan').innerHTML = listPdpt;
-            document.getElementById('tot-pdpt').innerText = "Rp " + tPdpt.toLocaleString();
-            document.getElementById('pajak-final').innerText = "Rp " + (tPdpt * 0.005).toLocaleString();
-            document.getElementById('list-biaya').innerHTML = listBiaya;
-            document.getElementById('tot-biaya').innerText = "Rp " + tBiaya.toLocaleString();
-            
-            let laba = tPdpt - tBiaya;
-            document.getElementById('val-laba').innerText = "Rp " + laba.toLocaleString();
-            document.getElementById('box-laba').className = laba >= 0 ? "total-box profit" : "total-box loss";
-            document.getElementById('label-laba').innerText = laba >= 0 ? "LABA BERSIH (UNTUNG)" : "RUGI BERSIH";
 
-            // Render Neraca
-            let listHarta = "", listPasiva = "";
-            for(let k in s) {
-                if(s[k] === 0) continue;
-                let row = `<div class="report-row"><span>${COA[k]}</span><span>Rp ${s[k].toLocaleString()}</span></div>`;
-                if(k[0] === '1') { listHarta += row; tHarta += s[k]; }
-                if(k[0] === '2' || k[0] === '3') { listPasiva += row; tModal += s[k]; }
-            }
-            document.getElementById('list-harta').innerHTML = listHarta;
-            document.getElementById('tot-harta').innerText = "Rp " + tHarta.toLocaleString();
-            document.getElementById('list-pasiva').innerHTML = listPasiva;
-            document.getElementById('laba-berjalan').innerText = "Rp " + laba.toLocaleString();
-            document.getElementById('tot-pasiva').innerText = "Rp " + (tModal + laba).toLocaleString();
+            let netLaba = sPdpt - sBiaya;
+            document.getElementById('list-pdpt').innerHTML = lPdpt;
+            document.getElementById('sum-pdpt').innerText = sPdpt.toLocaleString();
+            document.getElementById('pajak-val').innerText = "Rp " + (sPdpt * 0.005).toLocaleString();
+            document.getElementById('list-biaya').innerHTML = lBiaya;
+            document.getElementById('sum-biaya').innerText = sBiaya.toLocaleString();
+            document.getElementById('val-laba').innerText = netLaba.toLocaleString();
+            document.getElementById('box-laba').style.background = netLaba >= 0 ? "#dcfce7" : "#fee2e2";
 
-            // Hutang Piutang
-            document.getElementById('val-piutang').innerText = "Rp " + s['1-1200'].toLocaleString();
-            document.getElementById('val-hutang').innerText = "Rp " + s['2-1100'].toLocaleString();
+            document.getElementById('nr-harta').innerHTML = lHarta;
+            document.getElementById('sum-harta').innerText = sHarta.toLocaleString();
+            document.getElementById('nr-kewajiban').innerHTML = lKew;
+            document.getElementById('nr-modal').innerHTML = lMod;
+            document.getElementById('nr-laba').innerText = netLaba.toLocaleString();
+            document.getElementById('sum-pasiva').innerText = (sKew + sMod + netLaba).toLocaleString();
         }
 
-        function exportCSV() {
-            const db = JSON.parse(localStorage.getItem('dakreativ_v2')) || [];
-            let csv = "Tanggal,Keterangan,Debit,Kredit,Nominal\n";
-            db.forEach(t => csv += `${t.tgl},${t.ket.replace(/,/g,' ')},${COA[t.deb]},${COA[t.kre]},${t.nom}\n`);
+        function downloadCSV() {
+            const db = JSON.parse(localStorage.getItem('dakreativ_pro_v3')) || [];
+            let csv = "Tanggal,No Bukti,Keterangan,Akun Debet,Akun Kredit,Nominal,Entitas,Jatuh Tempo\n";
+            db.forEach(t => csv += `${t.tgl},${t.bukti},${t.ket.replace(/,/g,' ')},${COA[t.deb].n},${COA[t.kre].n},${t.nom},${t.entitas},${t.tempo}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'Laporan_PT_Dakreativ_2026.csv');
-            a.click();
+            const a = document.createElement('a'); a.href = url; a.download = 'Audit_Jurnal_Dakreativ_2026.csv'; a.click();
         }
 
-        function resetData() { if(confirm("Hapus semua data permanent?")) { localStorage.clear(); location.reload(); } }
-
-        document.getElementById('tgl').valueAsDate = new Date();
-        updateOptions();
+        function resetData() { if(confirm("Hapus permanen semua data?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
