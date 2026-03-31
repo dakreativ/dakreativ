@@ -321,38 +321,76 @@
             document.getElementById('sum-pasiva').innerText = "Rp " + (sKew + sMod + netLaba).toLocaleString('id-ID');
         }
 
+        // FUNGSI DOWNLOAD YANG SUDAH DIPERBAIKI UNTUK EXCEL
         function downloadCSV() {
             const db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
             if(db.length === 0) return alert("Belum ada data transaksi tersimpan!");
 
             const filterBulan = document.getElementById('filter-bulan').value; // Format input: YYYY-MM
             let filteredDb = db;
-            let namaFile = 'Laporan_Jurnal_Dakreativ_Full.csv';
+            let namaFile = 'Laporan_Jurnal_Dakreativ_Full.xls'; // Diubah jadi .xls
 
-            // Jika form filter bulan diisi, saring datanya
             if(filterBulan) {
                 filteredDb = db.filter(t => t.tgl.startsWith(filterBulan));
                 if(filteredDb.length === 0) return alert(`Belum ada transaksi di bulan ${filterBulan}!`);
-                namaFile = `Laporan_Jurnal_Dakreativ_${filterBulan}.csv`;
+                namaFile = `Laporan_Jurnal_Dakreativ_${filterBulan}.xls`;
             }
 
-            // Separator diubah ke titik koma (;) agar rapi di Microsoft Excel region Indonesia
-            let csv = "Tanggal;No Bukti;Keterangan;Akun Debet;Akun Kredit;Nominal (Rp);Klien/Vendor\n";
+            // Membangun tabel HTML rahasia agar di-convert sempurna oleh Excel
+            let htmlTable = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    th { background-color: #0f766e; color: white; border: 1px solid #000; padding: 5px; }
+                    td { border: 1px solid #000; padding: 5px; }
+                </style>
+            </head>
+            <body>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>No Bukti</th>
+                            <th>Keterangan</th>
+                            <th>Akun Debet</th>
+                            <th>Akun Kredit</th>
+                            <th>Nominal (Rp)</th>
+                            <th>Klien/Vendor</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
             
             filteredDb.forEach(t => {
-                // Bersihkan enter dan titik koma dari teks agar format CSV tidak rusak
-                let cleanKet = t.ket.replace(/;/g,' ').replace(/\n/g, ' '); 
-                let cleanEntitas = t.entitas.replace(/;/g,' ').replace(/\n/g, ' ');
+                let cleanKet = t.ket.replace(/\n/g, ' '); 
+                let cleanEntitas = t.entitas.replace(/\n/g, ' ');
 
-                csv += `${t.tgl};${t.bukti};${cleanKet};${COA[t.deb].n};${COA[t.kre].n};${t.nom};${cleanEntitas}\n`;
+                htmlTable += `
+                        <tr>
+                            <td>${t.tgl}</td>
+                            <td>${t.bukti}</td>
+                            <td>${cleanKet}</td>
+                            <td>${COA[t.deb].n}</td>
+                            <td>${COA[t.kre].n}</td>
+                            <td>${t.nom}</td>
+                            <td>${cleanEntitas}</td>
+                        </tr>`;
             });
 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            htmlTable += `
+                    </tbody>
+                </table>
+            </body>
+            </html>`;
+
+            // Membuat file XLS
+            const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); 
             a.href = url; 
             a.download = namaFile; 
             a.click();
+            window.URL.revokeObjectURL(url);
         }
 
         function resetData() { 
