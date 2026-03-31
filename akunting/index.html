@@ -56,7 +56,7 @@
         
         <div style="padding: 20px; margin-top: 30px;">
             <label style="color: #cbd5e1; font-size: 11px; font-weight: normal; margin-bottom: 3px;">Filter Laporan per Bulan:</label>
-            <input type="month" id="filter-bulan" class="form-control" style="margin-bottom:15px; background: #1e293b; color: white; border: 1px solid #334155; font-size: 12px;">
+            <input type="month" id="filter-bulan" class="form-control" style="margin-bottom:15px; background: #1e293b; color: white; border: 1px solid #334155; font-size: 12px;" title="Kosongkan untuk laporan setahun penuh (Otomatis dipisah per bulan)">
             <button onclick="downloadCSV()" class="btn" style="background:#10b981; color:white; width:100%; margin-bottom:10px;">📥 Download Excel</button>
             <button onclick="resetData()" style="background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer; width:100%;">⚠️ Reset Data (Hapus)</button>
         </div>
@@ -133,7 +133,7 @@
             <div class="tax-box">
                 <strong>Pajak UMKM 0,5% Seluruh Waktu:</strong>
                 <span id="pajak-val" style="font-size: 24px; margin-left: 10px;">Rp 0</span>
-                <div style="font-size: 12px; margin-top: 5px;">(Pajak dihitung otomatis dari total seluruh uang masuk/pendapatan kotor. Untuk SPT, gunakan fitur Download Excel per bulan di menu kiri)</div>
+                <div style="font-size: 12px; margin-top: 5px;">(Pajak dihitung otomatis dari total seluruh uang masuk. Unduh Excel untuk melihat rincian pajak per bulannya.)</div>
             </div>
             <div class="card">
                 <h3 style="color:#16a34a;">PENDAPATAN KOTOR (OMZET)</h3>
@@ -321,26 +321,41 @@
             document.getElementById('sum-pasiva').innerText = "Rp " + (sKew + sMod + netLaba).toLocaleString('id-ID');
         }
 
-        // FUNGSI DOWNLOAD EXCEL DENGAN TAMBAHAN SUMMARY TOTAL
+        // FUNGSI DOWNLOAD EXCEL REKAP SETAHUN & PERBULAN
         function downloadCSV() {
             const db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
             if(db.length === 0) return alert("Belum ada data transaksi tersimpan!");
 
-            const filterBulan = document.getElementById('filter-bulan').value; // Format input: YYYY-MM
+            const filterBulan = document.getElementById('filter-bulan').value; // Format: YYYY-MM
             let filteredDb = db;
             let namaFile = 'Laporan_Keuangan_Dakreativ_Full.xls';
 
+            // Jika user mengisi filter, kita hanya ambil bulan itu
             if(filterBulan) {
                 filteredDb = db.filter(t => t.tgl.startsWith(filterBulan));
                 if(filteredDb.length === 0) return alert(`Belum ada transaksi di bulan ${filterBulan}!`);
                 namaFile = `Laporan_Keuangan_Dakreativ_${filterBulan}.xls`;
             }
 
-            let sumNominal = 0;
-            let totPdpt = 0;
-            let totBiaya = 0;
+            // Kelompokkan transaksi berdasarkan bulan (YYYY-MM)
+            let groupedData = {};
+            let grandOmzet = 0;
+            let grandBiaya = 0;
 
-            // Membangun tabel HTML
+            filteredDb.forEach(t => {
+                let monthKey = t.tgl.substring(0, 7); 
+                if (!groupedData[monthKey]) {
+                    groupedData[monthKey] = { trx: [], omzet: 0, biaya: 0, sumNominal: 0 };
+                }
+                
+                groupedData[monthKey].trx.push(t);
+                groupedData[monthKey].sumNominal += t.nom;
+                
+                if(COA[t.kre].cat === 'Pdpt') { groupedData[monthKey].omzet += t.nom; grandOmzet += t.nom; }
+                if(COA[t.deb].cat === 'Biaya') { groupedData[monthKey].biaya += t.nom; grandBiaya += t.nom; }
+            });
+
+            // Struktur HTML Dasar untuk diekspor ke Excel
             let htmlTable = `
             <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
@@ -348,34 +363,54 @@
                 <style>
                     th { background-color: #0f766e; color: white; border: 1px solid #000; padding: 5px; }
                     td { border: 1px solid #000; padding: 5px; }
+                    .title-tahunan { font-size: 16px; font-weight: bold; background-color: #0284c7; color: white; text-align: center; }
+                    .title-bulan { font-size: 14px; font-weight: bold; background-color: #1e293b; color: white; text-align: center; }
+                    .summary { font-weight: bold; background-color: #e2e8f0; }
                 </style>
             </head>
             <body>
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>No Bukti</th>
-                            <th>Keterangan</th>
-                            <th>Akun Debet</th>
-                            <th>Akun Kredit</th>
-                            <th>Nominal (Rp)</th>
-                            <th>Klien/Vendor</th>
-                        </tr>
-                    </thead>
                     <tbody>`;
-            
-            filteredDb.forEach(t => {
-                let cleanKet = t.ket.replace(/\n/g, ' '); 
-                let cleanEntitas = t.entitas.replace(/\n/g, ' ');
-                
-                sumNominal += t.nom;
-                
-                // Kalkulasi otomatis untuk Pendapatan & Biaya
-                if(COA[t.kre].cat === 'Pdpt') totPdpt += t.nom;
-                if(COA[t.deb].cat === 'Biaya') totBiaya += t.nom;
+
+            // BAGIAN 1: Jika tidak difilter (Data Full), Tampilkan Grand Total Tahunan di Atas
+            if(!filterBulan) {
+                let grandLaba = grandOmzet - grandBiaya;
+                let grandPajak = grandOmzet * 0.005;
 
                 htmlTable += `
+                    <tr><td colspan="7" class="title-tahunan">REKAPITULASI KESELURUHAN (TAHUNAN)</td></tr>
+                    <tr><td colspan="5">Total Pendapatan Kotor (Omzet) Seluruh Bulan</td><td colspan="2" style="font-weight:bold;">${grandOmzet}</td></tr>
+                    <tr><td colspan="5">Total Biaya & Pengeluaran Seluruh Bulan</td><td colspan="2" style="font-weight:bold; color:red;">${grandBiaya}</td></tr>
+                    <tr><td colspan="5" style="font-weight:bold; background-color:#dcfce7;">LABA BERSIH KESELURUHAN</td><td colspan="2" style="font-weight:bold; background-color:#dcfce7;">${grandLaba}</td></tr>
+                    <tr><td colspan="5" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">TOTAL ESTIMASI PAJAK UMKM 0.5%</td><td colspan="2" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">${grandPajak}</td></tr>
+                    <tr><td colspan="7"></td></tr>
+                    <tr><td colspan="7"></td></tr>
+                `;
+            }
+
+            // BAGIAN 2: Looping Rincian & Subtotal Per Bulan
+            let sortedMonths = Object.keys(groupedData).sort();
+            
+            sortedMonths.forEach(month => {
+                let dataBulan = groupedData[month];
+                
+                htmlTable += `
+                    <tr><td colspan="7" class="title-bulan">LAPORAN BULAN: ${month}</td></tr>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>No Bukti</th>
+                        <th>Keterangan</th>
+                        <th>Akun Debet</th>
+                        <th>Akun Kredit</th>
+                        <th>Nominal (Rp)</th>
+                        <th>Klien/Vendor</th>
+                    </tr>`;
+                    
+                // Masukkan transaksi bulan ini
+                dataBulan.trx.forEach(t => {
+                    let cleanKet = t.ket.replace(/\n/g, ' '); 
+                    let cleanEntitas = t.entitas.replace(/\n/g, ' ');
+                    htmlTable += `
                         <tr>
                             <td>${t.tgl}</td>
                             <td>${t.bukti}</td>
@@ -385,45 +420,46 @@
                             <td>${t.nom}</td>
                             <td>${cleanEntitas}</td>
                         </tr>`;
+                });
+
+                // Hitung Pajak dan Laba khusus bulan ini
+                let labaBulan = dataBulan.omzet - dataBulan.biaya;
+                let pajakBulan = dataBulan.omzet * 0.005;
+
+                htmlTable += `
+                    <tr>
+                        <td colspan="5" style="text-align:right;" class="summary">TOTAL TRANSAKSI JURNAL BULAN INI</td>
+                        <td class="summary">${dataBulan.sumNominal}</td>
+                        <td class="summary"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="background-color:#f8fafc;">Total Pendapatan (Omzet) Bulan Ini</td>
+                        <td colspan="2" style="font-weight:bold; background-color:#f8fafc;">${dataBulan.omzet}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="background-color:#f8fafc;">Total Biaya & Pengeluaran Bulan Ini</td>
+                        <td colspan="2" style="font-weight:bold; color:red; background-color:#f8fafc;">${dataBulan.biaya}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="font-weight:bold; background-color:#dcfce7;">LABA BERSIH BULAN ${month}</td>
+                        <td colspan="2" style="font-weight:bold; background-color:#dcfce7;">${labaBulan}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">Pajak Final 0.5% (Untuk SPT Masa Bulan ${month})</td>
+                        <td colspan="2" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">${pajakBulan}</td>
+                    </tr>
+                    <tr><td colspan="7"></td></tr>
+                    <tr><td colspan="7"></td></tr>
+                `;
             });
 
-            let labaBersih = totPdpt - totBiaya;
-            let pajak = totPdpt * 0.005;
-
-            // MENAMBAHKAN FOOTER TOTAL DI EXCEL
             htmlTable += `
-                        <tr>
-                            <td colspan="5" style="text-align:right; font-weight:bold; background-color:#e2e8f0;">TOTAL TRANSAKSI JURNAL</td>
-                            <td style="font-weight:bold; background-color:#e2e8f0;">${sumNominal}</td>
-                            <td style="background-color:#e2e8f0;"></td>
-                        </tr>
-                        <tr><td colspan="7"></td></tr>
-                        
-                        <tr>
-                            <td colspan="5" style="font-weight:bold; background-color:#16a34a; color:white;">RINGKASAN KEUANGAN</td>
-                            <td colspan="2" style="background-color:#16a34a;"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">Total Pendapatan Kotor (Omzet)</td>
-                            <td colspan="2" style="font-weight:bold;">${totPdpt}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">Total Biaya & Pengeluaran</td>
-                            <td colspan="2" style="font-weight:bold; color:red;">${totBiaya}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="font-weight:bold; background-color:#dcfce7;">LABA BERSIH</td>
-                            <td colspan="2" style="font-weight:bold; background-color:#dcfce7;">${labaBersih}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">Estimasi Pajak Final 0.5% (Dari Omzet)</td>
-                            <td colspan="2" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">${pajak}</td>
-                        </tr>
                     </tbody>
                 </table>
             </body>
             </html>`;
 
+            // Proses Download
             const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); 
