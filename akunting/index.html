@@ -321,22 +321,26 @@
             document.getElementById('sum-pasiva').innerText = "Rp " + (sKew + sMod + netLaba).toLocaleString('id-ID');
         }
 
-        // FUNGSI DOWNLOAD YANG SUDAH DIPERBAIKI UNTUK EXCEL
+        // FUNGSI DOWNLOAD EXCEL DENGAN TAMBAHAN SUMMARY TOTAL
         function downloadCSV() {
             const db = JSON.parse(localStorage.getItem('dakreativ_final')) || [];
             if(db.length === 0) return alert("Belum ada data transaksi tersimpan!");
 
             const filterBulan = document.getElementById('filter-bulan').value; // Format input: YYYY-MM
             let filteredDb = db;
-            let namaFile = 'Laporan_Jurnal_Dakreativ_Full.xls'; // Diubah jadi .xls
+            let namaFile = 'Laporan_Keuangan_Dakreativ_Full.xls';
 
             if(filterBulan) {
                 filteredDb = db.filter(t => t.tgl.startsWith(filterBulan));
                 if(filteredDb.length === 0) return alert(`Belum ada transaksi di bulan ${filterBulan}!`);
-                namaFile = `Laporan_Jurnal_Dakreativ_${filterBulan}.xls`;
+                namaFile = `Laporan_Keuangan_Dakreativ_${filterBulan}.xls`;
             }
 
-            // Membangun tabel HTML rahasia agar di-convert sempurna oleh Excel
+            let sumNominal = 0;
+            let totPdpt = 0;
+            let totBiaya = 0;
+
+            // Membangun tabel HTML
             let htmlTable = `
             <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
@@ -364,6 +368,12 @@
             filteredDb.forEach(t => {
                 let cleanKet = t.ket.replace(/\n/g, ' '); 
                 let cleanEntitas = t.entitas.replace(/\n/g, ' ');
+                
+                sumNominal += t.nom;
+                
+                // Kalkulasi otomatis untuk Pendapatan & Biaya
+                if(COA[t.kre].cat === 'Pdpt') totPdpt += t.nom;
+                if(COA[t.deb].cat === 'Biaya') totBiaya += t.nom;
 
                 htmlTable += `
                         <tr>
@@ -377,13 +387,43 @@
                         </tr>`;
             });
 
+            let labaBersih = totPdpt - totBiaya;
+            let pajak = totPdpt * 0.005;
+
+            // MENAMBAHKAN FOOTER TOTAL DI EXCEL
             htmlTable += `
+                        <tr>
+                            <td colspan="5" style="text-align:right; font-weight:bold; background-color:#e2e8f0;">TOTAL TRANSAKSI JURNAL</td>
+                            <td style="font-weight:bold; background-color:#e2e8f0;">${sumNominal}</td>
+                            <td style="background-color:#e2e8f0;"></td>
+                        </tr>
+                        <tr><td colspan="7"></td></tr>
+                        
+                        <tr>
+                            <td colspan="5" style="font-weight:bold; background-color:#16a34a; color:white;">RINGKASAN KEUANGAN</td>
+                            <td colspan="2" style="background-color:#16a34a;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">Total Pendapatan Kotor (Omzet)</td>
+                            <td colspan="2" style="font-weight:bold;">${totPdpt}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">Total Biaya & Pengeluaran</td>
+                            <td colspan="2" style="font-weight:bold; color:red;">${totBiaya}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="font-weight:bold; background-color:#dcfce7;">LABA BERSIH</td>
+                            <td colspan="2" style="font-weight:bold; background-color:#dcfce7;">${labaBersih}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">Estimasi Pajak Final 0.5% (Dari Omzet)</td>
+                            <td colspan="2" style="font-weight:bold; color:#92400e; background-color:#fef3c7;">${pajak}</td>
+                        </tr>
                     </tbody>
                 </table>
             </body>
             </html>`;
 
-            // Membuat file XLS
             const blob = new Blob([htmlTable], { type: 'application/vnd.ms-excel' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); 
